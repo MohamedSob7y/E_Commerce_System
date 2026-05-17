@@ -1,6 +1,10 @@
-
+﻿
+using E_Commerce.Api.Extentions;
+using E_Commerce.Domain.Constracts;
+using E_Commerce.Persistance.Data.DataSeeding;
 using E_Commerce.Persistance.Data.DBContext;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Writers;
 
 namespace E_Commerce.Api
 {
@@ -29,8 +33,19 @@ namespace E_Commerce.Api
 
             #endregion
             //============================================
+            #region Inject Object From ISedding Data
+            builder.Services.AddScoped<IDataSeeding, DataSeeding>();//Inject Object From ISeeding Data
+            #endregion
+            //============================================
             #region Build Application on server
             var app = builder.Build();
+            #endregion
+            //============================================
+            #region Call Method Seeding Data
+            //عشان اعرف انادى الMethod اللى جوه الSeedingData هى محتاجه DbContext object وهنا مش هعرف ask CLR To Inject this Object By implicitlyعن طريق Constructor لان مشهينفع اعمله هنا فى Main بالتالى هطلبه بطريقة غير مباشرة Explcitily From Clr
+            //Explcicit Injection Fom DbContext
+            app.MigrateDatabase();//Call Extention Method
+            app.SeedData();//Call ExtentionMethods
             #endregion
             //============================================
             #region Configuration using MiddleWare
