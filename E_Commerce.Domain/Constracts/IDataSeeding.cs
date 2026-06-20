@@ -9,6 +9,6 @@ namespace E_Commerce.Domain.Constracts
     public interface IDataSeeding
     {
         //Functions Check If Seeding Is Succes of Fail
-        void Intialize();
+       Task  IntializeAsync();
     }
 }

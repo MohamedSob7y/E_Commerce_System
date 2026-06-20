@@ -19,14 +19,17 @@ namespace E_Commerce.Persistance.Data.DataSeeding
         {
             _storeDBContext = storeDBContext;
         }
-        public void Intialize()
+        public async Task IntializeAsync()
         {
             try
             {
                 //Check if Tables Is Empty Or Not عشان ادخله الداتا => So Need object From DbContext
-                var hasProduct = _storeDBContext.Products.Any();
-                var hasBrand = _storeDBContext.productBrands.Any();
-                var HasTypes = _storeDBContext.productTypes.Any();
+                var hasProduct =await _storeDBContext.Products.AnyAsync();//this Database hits must be work as Ascync لان انا بحول اى Function to Async فى تلت حالات 
+                //1: Database Operation Hits  2:External Api Call    3: File input or output Reader
+                //any Function Work as Async => Return Type is Task 
+                //All Linq Method has method With Async  
+                var hasBrand =await _storeDBContext.productBrands.AnyAsync();
+                var HasTypes =await _storeDBContext.productTypes.AnyAsync();
                 if (hasProduct && hasBrand && HasTypes)
                 {
                     return;//كدة معناناها فى Data in Tables كدة مش هينفع اعمل Seeding For Data 
@@ -37,20 +40,20 @@ namespace E_Commerce.Persistance.Data.DataSeeding
                 if (!hasBrand)
                 {
                     //اقرا الداتا + AddRange
-                    SeedDataFromJson<ProductBrand, int>("brands.json",_storeDBContext.productBrands);
+                   await SeedDataFromJson<ProductBrand, int>("brands.json",_storeDBContext.productBrands);
                 }
                 if (!HasTypes)
                 {
                     //Read Data + AddRange
-                    SeedDataFromJson<ProductType, int>("types.json", _storeDBContext.productTypes);
+                   await SeedDataFromJson<ProductType, int>("types.json", _storeDBContext.productTypes);
 
                 }
-                _storeDBContext.SaveChanges();  
+                await  _storeDBContext.SaveChangesAsync();  
                 //محتاج Savehcnages in Database الاول 
                 if (!hasProduct)
                 {
-                    SeedDataFromJson<Product, int>("products.json", _storeDBContext.Products);
-                    _storeDBContext.SaveChanges();
+                   await SeedDataFromJson<Product, int>("products.json", _storeDBContext.Products);
+                   await _storeDBContext.SaveChangesAsync();
                 }
               
             }
@@ -59,7 +62,7 @@ namespace E_Commerce.Persistance.Data.DataSeeding
                 Console.WriteLine($"An Error Accured During Seeding Data {ex}");
             }
         }
-        private void SeedDataFromJson<T, Tkey>(string filename, DbSet<T> dbset) where T : BaseEntity<Tkey>
+        private async Task  SeedDataFromJson<T, Tkey>(string filename, DbSet<T> dbset) where T : BaseEntity<Tkey>
             //Read DataFromJson+AddRang DataLocal in Database
         {
             //this Full Path of FIles Brand=> F:\Projects\E_Commerce_System\E_Commerce.Persistance\Data\Json Files\brands.json
@@ -74,13 +77,13 @@ namespace E_Commerce.Persistance.Data.DataSeeding
             {
                 //var Data = File.ReadAllText(filepath);//Read Data As String ولو الفايلات كبيرة هتبقى مشكلة =>So Open Stream with File To REad Data as Bytes When Serializing عشان مش عايز اعمل Load Data in Ram
                 var DataStream = File.OpenRead(filepath);//Read File From Stream 
-                var Data = JsonSerializer.Deserialize<List<T>>(DataStream, new JsonSerializerOptions
+                var Data =await JsonSerializer.DeserializeAsync<List<T>>(DataStream, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,//To Ignore Case Senstives 
                 });//Read From Stream then Convert this To ListOfT
                 if (Data is not null)
                 {
-                    dbset.AddRange(Data);
+                   await dbset.AddRangeAsync(Data);
                 }
             }
             catch (Exception ex)
