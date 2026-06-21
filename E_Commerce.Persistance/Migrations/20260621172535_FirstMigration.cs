@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace E_Commerce.Persistance.Data.Migrations
+namespace E_Commerce.Persistance.Migrations
 {
     /// <inheritdoc />
-    public partial class ProductModuleMigration : Migration
+    public partial class FirstMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -4,6 +4,8 @@ using E_Commerce.Domain.Constracts;
 using E_Commerce.Persistance.Data.DataSeeding;
 using E_Commerce.Persistance.Data.DBContext;
 using E_Commerce.Persistance.Repositories;
+using E_Commerce.Services;
+using E_Commerce.Services.Abstraction;
 using E_Commerce.Services.Mapping_Profiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Writers;
@@ -46,6 +48,10 @@ namespace E_Commerce.Api
             //============================================
             #region Inject Object From ISedding Data
             builder.Services.AddScoped<IDataSeeding, DataSeeding>();//Inject Object From ISeeding Data
+            #endregion
+            //============================================
+            #region Inject Object From ISedding Data
+            builder.Services.AddScoped<IProductService,ProductService>();
             #endregion
             //============================================
             #region Build Application on server

@@ -24,12 +24,12 @@ namespace E_Commerce.Persistance.Data.DataSeeding
             try
             {
                 //Check if Tables Is Empty Or Not عشان ادخله الداتا => So Need object From DbContext
-                var hasProduct =await _storeDBContext.Products.AnyAsync();//this Database hits must be work as Ascync لان انا بحول اى Function to Async فى تلت حالات 
+                var hasProduct = await _storeDBContext.Products.AnyAsync();//this Database hits must be work as Ascync لان انا بحول اى Function to Async فى تلت حالات 
                 //1: Database Operation Hits  2:External Api Call    3: File input or output Reader
                 //any Function Work as Async => Return Type is Task 
                 //All Linq Method has method With Async  
-                var hasBrand =await _storeDBContext.productBrands.AnyAsync();
-                var HasTypes =await _storeDBContext.productTypes.AnyAsync();
+                var hasBrand = await _storeDBContext.productBrands.AnyAsync();
+                var HasTypes = await _storeDBContext.productTypes.AnyAsync();
                 if (hasProduct && hasBrand && HasTypes)
                 {
                     return;//كدة معناناها فى Data in Tables كدة مش هينفع اعمل Seeding For Data 
@@ -40,29 +40,29 @@ namespace E_Commerce.Persistance.Data.DataSeeding
                 if (!hasBrand)
                 {
                     //اقرا الداتا + AddRange
-                   await SeedDataFromJson<ProductBrand, int>("brands.json",_storeDBContext.productBrands);
+                    await SeedDataFromJson<ProductBrand, int>("brands.json", _storeDBContext.productBrands);
                 }
                 if (!HasTypes)
                 {
                     //Read Data + AddRange
-                   await SeedDataFromJson<ProductType, int>("types.json", _storeDBContext.productTypes);
+                    await SeedDataFromJson<ProductType, int>("types.json", _storeDBContext.productTypes);
 
                 }
-                await  _storeDBContext.SaveChangesAsync();  
+                await _storeDBContext.SaveChangesAsync();
                 //محتاج Savehcnages in Database الاول 
                 if (!hasProduct)
                 {
-                   await SeedDataFromJson<Product, int>("products.json", _storeDBContext.Products);
-                   await _storeDBContext.SaveChangesAsync();
+                    await SeedDataFromJson<Product, int>("products.json", _storeDBContext.Products);
+                    await _storeDBContext.SaveChangesAsync();
                 }
-              
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An Error Accured During Seeding Data {ex}");
             }
         }
-        private async Task  SeedDataFromJson<T, Tkey>(string filename, DbSet<T> dbset) where T : BaseEntity<Tkey>
+        private async Task SeedDataFromJson<T, Tkey>(string filename, DbSet<T> dbset) where T : BaseEntity<Tkey>
             //Read DataFromJson+AddRang DataLocal in Database
         {
             //this Full Path of FIles Brand=> F:\Projects\E_Commerce_System\E_Commerce.Persistance\Data\Json Files\brands.json
@@ -77,13 +77,13 @@ namespace E_Commerce.Persistance.Data.DataSeeding
             {
                 //var Data = File.ReadAllText(filepath);//Read Data As String ولو الفايلات كبيرة هتبقى مشكلة =>So Open Stream with File To REad Data as Bytes When Serializing عشان مش عايز اعمل Load Data in Ram
                 var DataStream = File.OpenRead(filepath);//Read File From Stream 
-                var Data =await JsonSerializer.DeserializeAsync<List<T>>(DataStream, new JsonSerializerOptions
+                var Data = await JsonSerializer.DeserializeAsync<List<T>>(DataStream, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,//To Ignore Case Senstives 
                 });//Read From Stream then Convert this To ListOfT
                 if (Data is not null)
                 {
-                   await dbset.AddRangeAsync(Data);
+                    await dbset.AddRangeAsync(Data);
                 }
             }
             catch (Exception ex)

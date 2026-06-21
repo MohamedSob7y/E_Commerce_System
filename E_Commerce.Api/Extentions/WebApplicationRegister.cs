@@ -10,9 +10,9 @@ namespace E_Commerce.Api.Extentions
         //Has Two Method For Migration Data + Seeding 
         public static async Task<WebApplication> MigrateDatabaseAsync(this WebApplication app)
         {
-           await using var Scope =app.Services.CreateAsyncScope();
+            await using var Scope = app.Services.CreateAsyncScope();
             var dbContext = Scope.ServiceProvider.GetService<StoreDBContext>();
-            var PendingMigration =await dbContext.Database.GetPendingMigrationsAsync();
+            var PendingMigration = await dbContext.Database.GetPendingMigrationsAsync();
             if (PendingMigration.Any())
             {
                 dbContext.Database.Migrate();

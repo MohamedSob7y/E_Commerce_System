@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace E_Commerce.Persistance.Data.Migrations
+namespace E_Commerce.Persistance.Migrations
 {
     [DbContext(typeof(StoreDBContext))]
-    [Migration("20260427183447_ProductModuleMigration")]
-    partial class ProductModuleMigration
+    [Migration("20260621172535_FirstMigration")]
+    partial class FirstMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
