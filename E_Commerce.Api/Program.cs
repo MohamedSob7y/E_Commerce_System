@@ -43,7 +43,13 @@ namespace E_Commerce.Api
             #endregion
             //============================================
             #region Inject Object From Mapping Profile
-            builder.Services.AddAutoMapper(X=>X.AddProfile(typeof(ProductProfile)));
+            builder.Services.AddAutoMapper(typeof(ServiceAssemblyReference).Assembly);//Use Assembly For Licence => So Download Version Package Automapper اللى هى 14.0.0
+            //Make Dummy Class عشان مش عايز main.cs يوصل للMapping Profile لان دا مش احسن فى security بالتالى بخليه يوصل للDummy class واصلا هو بيعمل Assembly in Runtime for all Class in the Same Project اللى مع الclass دا فهيقدر يوصل للMapping Profile
+            //كدة قدرت اوصله بس مش Direct على طول لاء انا روحت استخدمت الDummy class يعنى Empty Class is public وهو بيعمل Resolve for all Classes in the same Project Assembly
+            #endregion
+            //============================================
+            #region Inject Object From ProductPictureUrlResolver
+            builder.Services.AddTransient<ProductPictureUrlResolver>();
             #endregion
             //============================================
             #region Inject Object From ISedding Data
@@ -76,7 +82,7 @@ namespace E_Commerce.Api
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
+            app.UseStaticFiles();
 
             app.MapControllers();
             #endregion
