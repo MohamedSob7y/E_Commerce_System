@@ -1,0 +1,96 @@
+specification Design Pattern => Make Dynamic Query 
+2: Simplify Rules and Logic in Repository 
+يعنى انا دلؤقتى محتاج تعديل على GetAll in Generic Repository محتاج اعمل if+Else وازود logic طب كدة هخليه More Complex 
+دا كدة Violate Concept Open For Extention + Closed For Modification
+يعنى كدة انا مش عايز اعدل على GetAll in Repository ولما المشروع بيكبر بتبقى more Complex لانها ممكن تزود داتا انت عايز تجبها عايز مثلا تعمل filteration عايز مثلا تعمل ordering 
+عشان كدة نستخدم الSpecification Pattern لانى بعدل فيه وبعمل كل حاجة وهو بيكون جاهز وشغال على اى Dynamic Query اللى ببعتهاله 
+كدة انا اشتغله OCP  + Simplify Code مخلتهوش كتير فى Generic Repository
+لان مثلا وانا بعمل test For GetAll Product return All Data + Producttype=Null + Product Brand =null فانا محتاج اعمل تعديل عشان اقدر اجيب الData دى من database يبقى كدة شغال Equarable 
+ولو معملتش كدة محتاج اعدل واضيف Endpiont + Service والموضوع هيكون صعب فمش احسن حاجة الحل هو استخدام الspcefication Pattern
+
+
+Solution 01 Before implement Specification Deisgn Pattern => Make FunC in GetAll in Generic Repository
+  #region Before Make Specification Design Pattern
+  public async Task<IEnumerable<TEntity>> GetAllAsync() => await _storeDBContext.Set<TEntity>().ToListAsync();
+  //public async Task<IEnumerable<TEntity>> GetAllAsync(Func<TEntity,bool>? contintion=default)
+  //{
+  //    if(contintion is null)
+  //    {
+  //        return await _storeDBContext.Set<TEntity>().Where(contintion).ToList();
+  //        //where has 4 Overload شغالة مع IEquable + Ienumberable طب ليه مفيش TolistAsync بعد where دى؟
+  //        //where دى طالما بتاخد FunC يبقى شغالة مع Ienumberable Not IEQuerable => عشان كدة مفيش TolistAsync طب اية العلاقة 
+  //        //any Function لو شغالة مع iequable يبقى لازم يكون عندها TolistAsync لان دى Database Operation 
+  //        //بالتالى الWhere شغالة مع Ienumberable عشان كدة مفيش TolistAsync 
+  //        //وطالما شغالة مع Ienumberable يبقى هروح اجيب الData From Database and make Fuletration in Memory So This More Complex 
+  //    }
+  //    else
+  //    {
+  //        return _storeDBContext.Set<TEntity>().Where(contintion).ToList();
+  //    }
+  //}
+
+  //=======================================================================================
+  //Solveing Probelms =>take Expression of FunC in GetAll =>
+  //1: Where شغالة على IEquerable Not Ieumerable ==> لانها واخد Expression of FunC not FunC=>So Filteration Make in Database وبعد كدة اجيب الData after Filetratinon in Memory
+  //So هستخدم TolistAsync لان where شغالة مع IEquerable
+  //public async Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? contintion = default)
+  //{
+  //    if (contintion is null)
+  //    {
+  //        return await _storeDBContext.Set<TEntity>().Where(contintion).ToListAsync();
+
+  //    }
+  //    else
+  //    {
+  //        return _storeDBContext.Set<TEntity>().Where(contintion).ToList();
+  //    }
+  //}
+  #endregion
+//طب وانا محتاج اعمل include عشان الProducttype+ ProductBrand وانا هنا فى Generic Repository يعنى لو عملت الinclude مش شايفه اى حاجة غير الEntity اللى بيورث منها كل الClass
+//فانا كدة مضطر اعمل Specific Repository دا كدة لكل حاجة عايز اعملها include 
+//ممكن احلها كدة 
+//بس كدة more Complex as in Generic Repository => اما يبعت الCondition only    2: Includes only    3: Includes + Condition
+
+public async Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? contintion = default,
+    List<Expression<Func<TEntity,object>>>? includes=default)
+{
+    //===================================================================
+    //includes only
+    if (includes is not null)
+    {
+        IQueryable<TEntity> entrypiont= _storeDBContext.Set<TEntity>();
+        foreach (var includeexpression in includes)
+        {
+            entrypiont=entrypiont.Include(includeexpression);
+        }
+    }
+    //===================================================================
+    //Condition only
+    if (contintion is not null)
+    {
+        return await _storeDBContext.Set<TEntity>().Where(contintion).ToListAsync();
+
+    }
+    //===================================================================
+    //Condition + includes
+    if(contintion is not null&&includes is not null)
+    {
+        IQueryable<TEntity> entrypiont = _storeDBContext.Set<TEntity>().Where(contintion);
+        foreach (var includeexpression in includes)
+        {
+            entrypiont = entrypiont.Include(includeexpression);
+        }
+    }
+    //==============================================================================
+    else
+    {
+        return _storeDBContext.Set<TEntity>().Where(contintion).ToList();
+    }
+}
+
+make specification عشان هنا بحط كل الل,Logic اللى انا عايزه وبعدين هو بيكون الQuery then Send this To Repository عشان تعمل Excute For this Query in Database لان دا المكان الوحيد اللى بيكلم الdatabase كدة ٌ Repository قدرت انها تتعامل مع اى Dynamic Query 
+يبقى كدة Specefication make Query هو اللى بيكونه وفى عندى Specification Evaluator عشان يحط الQuery دا على Specification بتاعته عشان يتكون مظبوط اشرحها الحتة دا ياشات + Send Dynamic Query To Repository To Excuted it 
+كل حاجة بعملها create specification object then Specification Evaluator Combin Object on Specification Pattern then send this To Repository
+
+
+https://chatgpt.com/share/6a4541b5-11d0-83ea-b4f1-0d7cca0c2acb 
