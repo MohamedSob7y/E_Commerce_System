@@ -1,0 +1,16 @@
+﻿using E_Commerce.Domain.Entityes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace E_Commerce.Domain.Constracts
+{
+    //this First Specification For Includes 
+    public interface ISpecification<TEntity, TKey> where TEntity : BaseEntity<TKey>
+    {
+        ICollection<Expression<Func<TEntity, object>>>? Includesexpression { get; }//Get in this Interface => is Signutaure of Property in  interface 
+    }
+}

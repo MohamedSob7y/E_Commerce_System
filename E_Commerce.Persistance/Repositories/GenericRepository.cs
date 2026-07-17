@@ -24,6 +24,9 @@ namespace E_Commerce.Persistance.Repositories
         //==================================================================
         #region Before Make Specification Design Pattern
         public async Task<IEnumerable<TEntity>> GetAllAsync() => await _storeDBContext.Set<TEntity>().ToListAsync();
+
+
+
         //public async Task<IEnumerable<TEntity>> GetAllAsync(Func<TEntity,bool>? contintion=default)
         //{
         //    if(contintion is null)
@@ -71,7 +74,7 @@ namespace E_Commerce.Persistance.Repositories
         //    //includes only
         //    if (includes is not null)
         //    {
-        //        IQueryable<TEntity> entrypiont= _storeDBContext.Set<TEntity>();
+        //        IQueryable<TEntity> entrypiont= _storeDBContext.Set<TEntity>();//ماسك الAll Products
         //        foreach (var includeexpression in includes)
         //        {
         //            entrypiont=entrypiont.Include(includeexpression);
@@ -88,7 +91,7 @@ namespace E_Commerce.Persistance.Repositories
         //    //Condition + includes
         //    if(contintion is not null&&includes is not null)
         //    {
-        //        IQueryable<TEntity> entrypiont = _storeDBContext.Set<TEntity>().Where(contintion);
+        //        IQueryable<TEntity> entrypiont = _storeDBContext.Set<TEntity>().Where(contintion);//All Products ماسك ال
         //        foreach (var includeexpression in includes)
         //        {
         //            entrypiont = entrypiont.Include(includeexpression);
@@ -100,6 +103,15 @@ namespace E_Commerce.Persistance.Repositories
         //        return _storeDBContext.Set<TEntity>().Where(contintion).ToList();
         //    }
         //}
+        #endregion
+        //==================================================================
+        #region After Make Specification Design Pattern
+        public async Task<IEnumerable<TEntity>> GetAllAsync(ISpecification<TEntity, TKey> specification)
+        {
+            //recive Query From SpecificationEvaluator Class to Excuted in Database
+            var Query= SpecificationEvaluator.CreateQuery(_storeDBContext.Set<TEntity>(), specification);
+            return await Query.ToListAsync();//Excute Query in Database 
+        }
         #endregion
         //==================================================================
         public async Task<TEntity?> GetByIdAsync(TKey id) => await _storeDBContext.Set<TEntity>().FindAsync(id);//Find بدور على 1object in Local Before Database

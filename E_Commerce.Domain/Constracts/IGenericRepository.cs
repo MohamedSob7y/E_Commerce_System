@@ -14,5 +14,9 @@ namespace E_Commerce.Domain.Constracts
         Task AddAsync(TEntity entity);
         void Update(TEntity entity);//void لانها شغالة Local يعنى مفيش اى Database Hits دا فى حالة Update+Delete
         void Delete(TEntity entity);
+        #region After Make Specification Design Pattern
+        Task<IEnumerable<TEntity>> GetAllAsync(ISpecification<TEntity,TKey> specification);
+
+        #endregion
     }
 }

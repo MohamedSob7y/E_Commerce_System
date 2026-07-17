@@ -2,6 +2,7 @@
 using E_Commerce.Domain.Constracts;
 using E_Commerce.Domain.Entityes;
 using E_Commerce.Services.Abstraction;
+using E_Commerce.Services.Specifications.ProductSpecification;
 using E_Commerce.Shared.DTOS;
 using System;
 using System.Collections.Generic;
@@ -32,9 +33,22 @@ namespace E_Commerce.Services
 
         public async Task<IEnumerable<ProductDTO>> GetAllProductsAsync()
         {
-            var products=await _uniteofWork.GetRepository<Product,int>().GetAllAsync();
+            #region Before Specification Design Pattern 
+            //var products = await _uniteofWork.GetRepository<Product, int>().GetAllAsync();
+            //if (!products.Any() || products is null) return [];
+            //return _Mapper.Map<IEnumerable<Product>, IEnumerable<ProductDTO>>(products); 
+            #endregion
+
+
+            #region After Specification Design Pattern
+            //دى عملتها كدة عشان عايز اعمل Navigation Property تكون Loaded عندى وانا بعمل GetAll Product=> تظهر معايا ال ProductBrand + ProductTypes 
+            //عايز اكون specification object For include Navigation Property => ProductBrand + ProductTypes
+            var Spec=new ProductWithTypeandBrandSpecification();
+            var products = await _uniteofWork.GetRepository<Product, int>().GetAllAsync(Spec);
             if (!products.Any() || products is null) return [];
             return _Mapper.Map<IEnumerable<Product>, IEnumerable<ProductDTO>>(products);
+
+            #endregion
         }
 
         public async Task<IEnumerable<TypeDTO>> GetAllTypeAsync()
