@@ -20,9 +20,12 @@ namespace E_Commerce.Persistance.Repositories
             _storeDBContext = storeDBContext;
         }
         public async Task AddAsync(TEntity entity)=> await _storeDBContext.Set<TEntity>().AddAsync(entity);
+        //==================================================================
         public void Delete(TEntity entity) => _storeDBContext.Set<TEntity>().Remove(entity);
         //==================================================================
         #region Before Make Specification Design Pattern
+
+        public async Task<TEntity?> GetByIdAsync(TKey id) => await _storeDBContext.Set<TEntity>().FindAsync(id);//Find بدور على 1object in Local Before Database
         public async Task<IEnumerable<TEntity>> GetAllAsync() => await _storeDBContext.Set<TEntity>().ToListAsync();
 
 
@@ -112,9 +115,15 @@ namespace E_Commerce.Persistance.Repositories
             var Query= SpecificationEvaluator.CreateQuery(_storeDBContext.Set<TEntity>(), specification);
             return await Query.ToListAsync();//Excute Query in Database 
         }
+        //==================================================================
+        public async Task<TEntity?> GetByIdAsync(ISpecification<TEntity, TKey> specification)
+        {
+           var Query=SpecificationEvaluator.CreateQuery(_storeDBContext.Set<TEntity>(),specification);
+            return await Query.FirstOrDefaultAsync();//Excute Query in Database => used this Function as this Signle Item Not List
+            //ليه مش بستخدم الFind => as Data Not Loaded in Memory=> as Firstordefault مستخدمة مع Data Not local
+        }
         #endregion
         //==================================================================
-        public async Task<TEntity?> GetByIdAsync(TKey id) => await _storeDBContext.Set<TEntity>().FindAsync(id);//Find بدور على 1object in Local Before Database
         public void Update(TEntity entity) => _storeDBContext.Set<TEntity>().Update(entity); 
     }
 }

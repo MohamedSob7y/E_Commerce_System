@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace E_Commerce.Persistance
 {
     //this class Combine Specification Object To Create Query and Send This Query To Repository to Excuted in Database  
+    //this Evaluator make Filetration only or Includes only or Fileration+ Includes 
     internal static class SpecificationEvaluator
     {
         //must has Method To Create Query From Specification Object
@@ -18,11 +19,16 @@ namespace E_Commerce.Persistance
             var query = Entrypiont;//DbContext.Product
             if(specification is not null)
             {
+                //Filetration Then Includes
+                if (specification.Cretaria is not null)
+                {
+                    query=query.Where(specification.Cretaria);//DbContext.Product.Where(p=>p.Id==id)
+                }
                 if (specification.Includesexpression is not null && specification.Includesexpression.Any())
                 {
                     #region Before Aggregate Linq Method 
                     //foreach (var includeEx in specification.Includesexpression)
-                    //{
+                    //{ 
                     //    query.Include(includeEx);
                     //} 
                     #endregion
@@ -30,6 +36,7 @@ namespace E_Commerce.Persistance
                     #region After Aggregate Linq Method
 
                     query= specification.Includesexpression.Aggregate(query, (currentquery, includeExpre) => currentquery.Include(includeExpre));//DbContext.Product.include() وكل شوية بعمل include For ProductType+ ProductBrand
+                    //DbSet<Product>().Include(p => p.ProductBrand).Include(p => p.ProductType) كل دا عشان اعمل الحتة دا 
                     #endregion
                 }
             }
