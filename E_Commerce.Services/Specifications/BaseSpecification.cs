@@ -30,7 +30,7 @@ namespace E_Commerce.Services.Specifications
         {
             Includesexpression?.Add(includeExpres);  //بعدى على expression واضيفه جوه ال Collection 
         }//this Method For Includes عشان حتة الInitlaization    
-
+        //this Method عشان اعمل Set For Property IncludeExpression
         #endregion
         //===========================================
         #region Sorting
