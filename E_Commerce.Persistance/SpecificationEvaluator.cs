@@ -1,4 +1,4 @@
-﻿using E_Commerce.Domain.Constracts;
+﻿    using E_Commerce.Domain.Constracts;
 using E_Commerce.Domain.Entityes;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -38,6 +38,20 @@ namespace E_Commerce.Persistance
                     query= specification.Includesexpression.Aggregate(query, (currentquery, includeExpre) => currentquery.Include(includeExpre));//DbContext.Product.include() وكل شوية بعمل include For ProductType+ ProductBrand
                     //DbSet<Product>().Include(p => p.ProductBrand).Include(p => p.ProductType) كل دا عشان اعمل الحتة دا 
                     #endregion
+                }
+                //this For Orderby and OrderbyDescending
+                if(specification.OrderBy is not null)
+                {
+                    query = query.OrderBy(specification.OrderBy);
+                }
+                if (specification.OrderByDescending is not null)
+                {
+                    query = query.OrderBy(specification.OrderByDescending);
+                }
+                if(specification.IsPaginated==true)
+                {
+                    query=query.Skip(specification.Skip)
+                        .Take(specification.Take);
                 }
             }
             return query;

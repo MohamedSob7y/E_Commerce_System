@@ -33,13 +33,25 @@ namespace E_Commerce.Api.Controllers
         //=========================================================
         #region After Specification Design Pattern For GetByIdBrandType and Search
         //دى بعملها عشان وانا بعمل Get All Product ابعتله الBrandId+ TypeId عشان يعمل الFiletration بتاعهم 
-        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts
-            ([FromQuery]ProductQueryParam productQueryParam)
+        //public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts
+        //    ([FromQuery]ProductQueryParam productQueryParam)
+        //{
+        //    //لازم اعرف Swagger اية هى نوع الData اللى هترجع لما يعمل Test بالتالى لازم اعرفه 
+        //    var Products = await _productService.GetAllProductsAsync(productQueryParam);
+        //    return Ok(Products);
+        //}
+
+        #endregion
+        //=========================================================
+        #region After Make Pagination and Make Specificaiton Design Pattern
+        public async Task<ActionResult<PaginatedResult<ProductDTO>>> GetAllProducts
+            ([FromQuery] ProductQueryParam productQueryParam)
         {
             //لازم اعرف Swagger اية هى نوع الData اللى هترجع لما يعمل Test بالتالى لازم اعرفه 
             var Products = await _productService.GetAllProductsAsync(productQueryParam);
             return Ok(Products);
         }
+
 
         #endregion
         //=========================================================

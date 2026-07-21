@@ -56,17 +56,28 @@ namespace E_Commerce.Services
         #endregion
         //=============================================================
         #region GetbrandbyidWithInclude+GetTypebyid with Include
-        public async Task<IEnumerable<ProductDTO>> GetAllProductsAsync(ProductQueryParam productQueryParam)//For Filteration For Brand+Type
+        //public async Task<IEnumerable<ProductDTO>> GetAllProductsAsync(ProductQueryParam productQueryParam)//For Filteration For Brand+Type
+        //{
+        //    //دى عملتها كدة عشان عايز اعمل Navigation Property تكون Loaded عندى وانا بعمل GetAll Product=> تظهر معايا ال ProductBrand + ProductTypes 
+        //    //عايز اكون specification object For include Navigation Property => ProductBrand + ProductTypes
+        //    var Spec = new ProductWithTypeandBrandSpecification(productQueryParam);
+        //    var products = await _uniteofWork.GetRepository<Product, int>().GetAllAsync(Spec);
+        //    if (!products.Any() || products is null) return [];
+        //    return _Mapper.Map<IEnumerable<Product>, IEnumerable<ProductDTO>>(products);
+        //}
+        #endregion
+        //=============================================================
+        #region GetAll Product After Applying Pagination
+        public async Task<PaginatedResult<ProductDTO>> GetAllProductsAsync(ProductQueryParam productQueryParam)//For Filteration For Brand+Type
         {
-            #region After Specification Design Pattern With GetTypeid_BrandId
             //دى عملتها كدة عشان عايز اعمل Navigation Property تكون Loaded عندى وانا بعمل GetAll Product=> تظهر معايا ال ProductBrand + ProductTypes 
             //عايز اكون specification object For include Navigation Property => ProductBrand + ProductTypes
             var Spec = new ProductWithTypeandBrandSpecification(productQueryParam);
             var products = await _uniteofWork.GetRepository<Product, int>().GetAllAsync(Spec);
-            if (!products.Any() || products is null) return [];
-            return _Mapper.Map<IEnumerable<Product>, IEnumerable<ProductDTO>>(products);
-
-            #endregion
+            var DataToReturn= _Mapper.Map<IEnumerable<Product>, IEnumerable<ProductDTO>>(products);
+            var CountofReturnedData = DataToReturn.Count();
+            return new PaginatedResult<ProductDTO>
+                (productQueryParam.PageIndex, CountofReturnedData,0, DataToReturn);
         }
         #endregion
         //=============================================================

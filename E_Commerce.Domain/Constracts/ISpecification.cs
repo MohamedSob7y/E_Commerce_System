@@ -20,7 +20,20 @@ namespace E_Commerce.Domain.Constracts
         //==============================================
         #region For Filteration [Where]
         //Second Cretaria For GetById For Filteration + Includes 
-        Expression<Func<TEntity, bool>>? Cretaria { get; } 
+        Expression<Func<TEntity, bool>>? Cretaria { get; }
+        #endregion
+        //==============================================
+        #region For Sorting
+
+        Expression<Func<TEntity, object>>? OrderBy { get; }
+        Expression<Func<TEntity, object>>? OrderByDescending{ get; }
+
+        #endregion
+        //==============================================
+        #region For Pagination
+         int Skip { get;}//this Property معناها انا هسيب كام Product عشان اخد الProduct اللى انا عايزه 
+         int Take { get;}//انا هاخد كام Product From Page اللى انا قسمتها عليه 
+         bool IsPaginated { get;}//For Check that pagination is appliyed for query or not => This Property تشوف هل هنطبق الPagination in this Query Or Not
         #endregion
     }
 }
