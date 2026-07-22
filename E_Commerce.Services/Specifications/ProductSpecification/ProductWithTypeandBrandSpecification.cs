@@ -23,14 +23,8 @@ using System;
         #region For GetTypeByIdWithInclude And GetBrandByIdWithIncludes and Search And Sorting
         //this Constructor With three Cases 
         public ProductWithTypeandBrandSpecification(ProductQueryParam productQuery)
-        : base(P => 
-        (!productQuery.TypeId.HasValue || P.ProductTypeId == productQuery.TypeId.Value)&&
-        (!productQuery.BrandId.HasValue || P.ProductBrandId == productQuery.BrandId.Value)&&
-        (string.IsNullOrEmpty(productQuery.Search) ||P.Name.ToLower().Contains(productQuery.Search.ToLower())))  
-            //this Just For Brand and Type With includes
-            //This Can use With Brand Only with includes
-            //This Can Use With Type Only with  includes
-            //This Can Use With Search Only or Search with Type only or Search with Type and brand  or Search With Brand Only
+        : base(ProductSpecificationHelper.GetCretaria(productQuery))   //this Class Send Cretaria To Base Specification
+
         {
             //For Chain Base Constrauctor 
             AddInclude(p => p.ProductBrand);

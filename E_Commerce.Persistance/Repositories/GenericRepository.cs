@@ -19,6 +19,7 @@ namespace E_Commerce.Persistance.Repositories
         {
             _storeDBContext = storeDBContext;
         }
+        //==================================================================
         public async Task AddAsync(TEntity entity)=> await _storeDBContext.Set<TEntity>().AddAsync(entity);
         //==================================================================
         public void Delete(TEntity entity) => _storeDBContext.Set<TEntity>().Remove(entity);
@@ -124,6 +125,13 @@ namespace E_Commerce.Persistance.Repositories
         }
         #endregion
         //==================================================================
-        public void Update(TEntity entity) => _storeDBContext.Set<TEntity>().Update(entity); 
+        public void Update(TEntity entity) => _storeDBContext.Set<TEntity>().Update(entity);
+        //==================================================================
+        #region After Make Pagination For Count Property
+        public async Task<int> CountAsync(ISpecification<TEntity, TKey> specification)//for Count All Product اللى موجودين اصلا فى Database انما مش بتعد بعد الPagination لازم اقعد قبل تطبيق الPagination
+        {
+            return await SpecificationEvaluator.CreateQuery(_storeDBContext.Set<TEntity>(),specification).CountAsync();//this Generate This Query  DbContex.Product.where(P=>P.brand=2).count()
+        } 
+        #endregion
     }
 }

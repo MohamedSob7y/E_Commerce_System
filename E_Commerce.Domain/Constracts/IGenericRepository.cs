@@ -21,5 +21,10 @@ namespace E_Commerce.Domain.Constracts
         Task<IEnumerable<TEntity>> GetAllAsync(ISpecification<TEntity,TKey> specification);
         Task<TEntity?> GetByIdAsync(ISpecification<TEntity, TKey> specification);//For includes + Filteration by id 
         #endregion
+        //=============================================
+        #region After Make Pagination For Count Property 
+        Task<int> CountAsync(ISpecification<TEntity,TKey> specification);
+        #endregion
+        //=============================================
     }
 }

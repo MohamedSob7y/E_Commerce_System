@@ -53,7 +53,6 @@ namespace E_Commerce.Services.Specifications
         #region Pagniation
         public int Skip { get; private set; }
         public int Take { get; private set; }
-
         public bool IsPaginated { get; private set; }
         //make Method Apply Paination To Set This Property 
        //this Method For Setting Pagination Property 

@@ -14,7 +14,7 @@ namespace E_Commerce.Services.Abstraction
         //Task<IEnumerable<ProductDTO>> GetAllProductsAsync(ProductQueryParam productQueryParam);
         #endregion
         //=================================================
-        #region Before Applying Pagination but After Applying Specification Design Pattern
+        #region After Applying Pagination and After Applying Specification Design Pattern
         Task<PaginatedResult<ProductDTO>> GetAllProductsAsync(ProductQueryParam productQueryParam);
         #endregion
         //=================================================

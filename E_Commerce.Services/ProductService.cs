@@ -70,14 +70,21 @@ namespace E_Commerce.Services
         #region GetAll Product After Applying Pagination
         public async Task<PaginatedResult<ProductDTO>> GetAllProductsAsync(ProductQueryParam productQueryParam)//For Filteration For Brand+Type
         {
+            var Repo =  _uniteofWork.GetRepository<Product, int>();
             //دى عملتها كدة عشان عايز اعمل Navigation Property تكون Loaded عندى وانا بعمل GetAll Product=> تظهر معايا ال ProductBrand + ProductTypes 
             //عايز اكون specification object For include Navigation Property => ProductBrand + ProductTypes
+            //=================================================================================================================================
             var Spec = new ProductWithTypeandBrandSpecification(productQueryParam);
-            var products = await _uniteofWork.GetRepository<Product, int>().GetAllAsync(Spec);
-            var DataToReturn= _Mapper.Map<IEnumerable<Product>, IEnumerable<ProductDTO>>(products);
+            var products =await Repo.GetAllAsync(Spec);
+            //=================================================================================================================================
+            var newSpec =new ProductWithCountSpecification(productQueryParam);
+            var totalCount=await Repo.CountAsync(newSpec);//this For Count Before Pagination 
+            //=================================================================================================================================
+            var DataToReturn = _Mapper.Map<IEnumerable<Product>, IEnumerable<ProductDTO>>(products);
             var CountofReturnedData = DataToReturn.Count();
+            //=================================================================================================================================
             return new PaginatedResult<ProductDTO>
-                (productQueryParam.PageIndex, CountofReturnedData,0, DataToReturn);
+                (productQueryParam.PageIndex, CountofReturnedData, totalCount, DataToReturn);
         }
         #endregion
         //=============================================================
