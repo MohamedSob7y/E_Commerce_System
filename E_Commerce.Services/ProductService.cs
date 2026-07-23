@@ -78,7 +78,7 @@ namespace E_Commerce.Services
             var products =await Repo.GetAllAsync(Spec);
             //=================================================================================================================================
             var newSpec =new ProductWithCountSpecification(productQueryParam);
-            var totalCount=await Repo.CountAsync(newSpec);//this For Count Before Pagination 
+            var totalCount=await Repo.CountAsync(newSpec);//this For Count Before Pagination عشان كدة عملت New specification جديدة لان لو بعتلها القديمة اللى هى ProductWithTypeAndBrandSpecification كدة هو هيعمل الCount After Pagination وانا مش عايز كدة عشان كدة عملت واحدة جديدة للحتة دى  
             //=================================================================================================================================
             var DataToReturn = _Mapper.Map<IEnumerable<Product>, IEnumerable<ProductDTO>>(products);
             var CountofReturnedData = DataToReturn.Count();

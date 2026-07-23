@@ -1,0 +1,199 @@
+https://chatgpt.com/share/6a622ba5-c100-83ea-a696-857f2847ba10
+
+الـProject Business ببساطة
+
+المشروع عبارة عن Backend لنظام E-Commerce أو متجر إلكتروني، هدفه إدارة رحلة العميل كاملة بدايةً من تصفح المنتجات، لحد إنشاء الطلب والدفع.
+
+يعني النظام مسؤول عن:
+
+عرض المنتجات → إضافة للسلة → تسجيل الدخول → إنشاء الطلب → اختيار التوصيل → الدفع → متابعة الطلب
+
+1. Product Management
+
+العميل يقدر يشوف المنتجات الموجودة في المتجر، مع إمكانية:
+
+البحث باسم المنتج.
+الفلترة حسب الـBrand أو الـProduct Type.
+ترتيب المنتجات حسب الاسم أو السعر.
+تقسيم النتائج إلى صفحات باستخدام Pagination.
+فتح تفاصيل منتج معين.
+
+مثال:
+
+العميل يبحث عن “Laptop”، يختار Brand معين، ويرتب النتائج من الأقل سعرًا إلى الأعلى.
+
+الـEndpoints المسؤولة:
+
+GET /api/Products
+GET /api/Products/{id}
+GET /api/Products/brands
+GET /api/Products/types
+2. Shopping Cart أو Basket
+
+كل عميل يكون له Basket خاصة به، ويمكنه:
+
+إضافة منتج.
+زيادة أو تقليل الكمية.
+حذف منتج من السلة.
+حذف السلة بالكامل.
+استرجاع محتويات السلة.
+
+السلة غالبًا يتم تخزينها في Redis بدل قاعدة البيانات؛ لأن بياناتها مؤقتة وتحتاج سرعة عالية.
+
+الـEndpoints:
+
+GET /api/Baskets?id={id}
+POST /api/Baskets
+DELETE /api/Baskets/{id}
+
+ملحوظة: POST هنا تُستخدم لإنشاء السلة أو تحديثها بالكامل.
+
+3. User Authentication
+
+قبل أن ينشئ العميل Order، يجب أن يسجل حسابًا أو يعمل Login.
+
+النظام يوفر:
+
+تسجيل حساب جديد.
+تسجيل الدخول.
+JWT Token Authentication.
+Role-Based Authorization.
+تشفير كلمات المرور باستخدام ASP.NET Core Identity.
+التأكد هل البريد الإلكتروني مستخدم أم لا.
+استرجاع بيانات المستخدم الحالي.
+إضافة وتحديث عنوان العميل.
+
+الـEndpoints:
+
+POST /api/Authentication/Register
+POST /api/Authentication/Login
+GET  /api/Authentication/emailexists
+GET  /api/Authentication/CurrentUser
+GET  /api/Authentication/Address
+PUT  /api/Authentication/Address
+
+بعد الـLogin، السيرفر يُرجع JWT Token، والعميل يرسله مع الطلبات المحمية:
+
+Authorization: Bearer <token>
+4. Order Processing
+
+عندما يضغط العميل على Place Order، يقوم النظام بتحويل محتويات الـBasket إلى Order حقيقي.
+
+أثناء إنشاء الطلب، النظام يقوم بعدة خطوات مهمة:
+
+قراءة المنتجات الموجودة في السلة.
+جلب الأسعار الحالية من قاعدة البيانات.
+عدم الاعتماد على السعر الموجود داخل Basket.
+حساب إجمالي الطلب.
+إضافة تكلفة التوصيل.
+حفظ عنوان التوصيل.
+إنشاء الطلب وحفظه في قاعدة البيانات.
+تمكين العميل من متابعة حالة الطلب.
+
+التحقق من السعر مهم لأن العميل يمكن أن يكون قد أضاف المنتج للسلة بسعر قديم، أو يحاول تعديل بيانات الـBasket من جهة الـFrontend.
+
+الـEndpoints:
+
+POST /api/Orders
+GET  /api/Orders
+GET  /api/Orders/{id}
+GET  /api/Orders/deliveryMethods
+
+حالات الطلب قد تكون مثل:
+
+Pending
+Payment Received
+Payment Failed
+Processing
+Shipped
+Delivered
+Cancelled
+5. Delivery Methods
+
+قبل تأكيد الطلب، يختار العميل طريقة التوصيل المناسبة، مثل:
+
+Standard Delivery.
+Fast Delivery.
+Same-Day Delivery.
+
+كل Delivery Method تحتوي عادةً على:
+
+الاسم.
+الوصف.
+مدة التوصيل.
+السعر.
+
+تكلفة التوصيل تتم إضافتها إلى إجمالي الطلب:
+
+Order Total = Products Subtotal + Delivery Cost
+6. Payment Integration
+
+المشروع متكامل مع Stripe Payment Gateway.
+
+عندما يكون العميل جاهزًا للدفع، النظام:
+
+يأخذ رقم الـBasket.
+يعيد حساب الأسعار من قاعدة البيانات.
+يحسب إجمالي المبلغ.
+ينشئ PaymentIntent في Stripe.
+يُرجع ClientSecret للـFrontend.
+يستخدم الـFrontend هذا الـClientSecret لإتمام الدفع.
+
+الـEndpoint:
+
+POST /api/Payments/{basketId}
+
+الهدف من الـPayment Intent هو أن السيرفر يحدد المبلغ الحقيقي، بدل أن يرسل العميل المبلغ بنفسه.
+
+7. Caching Strategy
+
+النظام يستخدم Redis في وظيفتين أساسيتين:
+
+تخزين الـBasket
+
+لأن Basket بيانات مؤقتة وسريعة التغيير، وتخزينها في Redis أسرع من SQL Server.
+
+Response Caching
+
+يتم تخزين نتيجة بعض طلبات GET، مثل المنتجات أو الـBrands، لفترة محددة تسمى:
+
+TTL — Time To Live
+
+مثال:
+
+إذا طلب 100 مستخدم قائمة الـBrands، ليس من الضروري تنفيذ Query على قاعدة البيانات 100 مرة. يتم إرجاع النتيجة من الـCache حتى انتهاء الـTTL.
+
+الفائدة:
+
+تقليل الضغط على قاعدة البيانات.
+تحسين سرعة الاستجابة.
+رفع قدرة النظام على خدمة عدد أكبر من المستخدمين.
+رحلة العميل داخل المشروع
+
+الـBusiness Flow الكامل يكون كالتالي:
+
+1. العميل يفتح المتجر
+2. يعرض المنتجات ويستخدم Search وFiltering
+3. يفتح تفاصيل منتج
+4. يضيف المنتج إلى Basket
+5. يعدل الكميات أو يحذف منتجات
+6. يسجل حسابًا أو يعمل Login
+7. يضيف عنوان التوصيل
+8. يختار Delivery Method
+9. النظام ينشئ Payment Intent
+10. العميل يدفع باستخدام Stripe
+11. النظام يحول Basket إلى Order
+12. العميل يعرض طلباته ويتابع حالة الطلب
+مثال عملي
+
+عميل يريد شراء سماعة سعرها 2,000 جنيه:
+
+Product Price:   2,000
+Quantity:            2
+Subtotal:        4,000
+Delivery Cost:     100
+Total:           4,100
+
+العميل يضيف السماعتين إلى Basket، ثم يختار طريقة التوصيل.
+
+قبل إنشاء الـPayment Intent، النظام يجلب سعر السماعة الحالي من قاعدة البيانات، وليس من السلة. بعد ذلك يرسل إلى Stripe مبلغ 4,100، ثم ينشئ الـOrder ويربطه بعملية الدفع.
