@@ -9,6 +9,8 @@ using E_Commerce.Services.Abstraction;
 using E_Commerce.Services.Mapping_Profiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Writers;
+using StackExchange.Redis;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 
 namespace E_Commerce.Api
@@ -30,7 +32,7 @@ namespace E_Commerce.Api
             builder.Services.AddSwaggerGen();
             #endregion
             //============================================
-            #region Inject Dependency
+            #region Inject Dependency For DbContext
             builder.Services.AddDbContext<StoreDBContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
@@ -40,6 +42,18 @@ namespace E_Commerce.Api
             //============================================
             #region Inject Object From IUniteofWork
             builder.Services.AddScoped<IUniteofWork, UniteofWork>();
+            #endregion
+            //============================================
+            #region Inject Object From IConnectionMultiplexer using Redis For Basket Module
+
+            builder.Services.AddSingleton<IConnectionMultiplexer>(P=>
+            {
+                return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!);
+            });//لانى عايز الObject All Life Cycle of Application 
+            #endregion
+            //============================================
+            #region Inject Object From IBasketRepo in BasketService
+            builder.Services.AddScoped<IBasketRepository,BasketRepository>();
             #endregion
             //============================================
             #region Inject Object From Mapping Profile
@@ -56,7 +70,7 @@ namespace E_Commerce.Api
             builder.Services.AddScoped<IDataSeeding, DataSeeding>();//Inject Object From ISeeding Data
             #endregion
             //============================================
-            #region Inject Object From ISedding Data
+            #region Inject Object From IProductService
             builder.Services.AddScoped<IProductService,ProductService>();
             #endregion
             //============================================

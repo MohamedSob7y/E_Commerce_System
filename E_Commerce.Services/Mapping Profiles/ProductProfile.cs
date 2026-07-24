@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using E_Commerce.Domain.Entityes;
+using E_Commerce.Domain.Entityes.Basket_Module;
 using E_Commerce.Shared.DTOS;
+using E_Commerce.Shared.DTOS.BasketDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +30,7 @@ namespace E_Commerce.Services.Mapping_Profiles
             #endregion
 
             //==================================================================================
-
+          
         }
     }
 }
