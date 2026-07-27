@@ -1,4 +1,5 @@
-﻿using E_Commerce.Services.Abstraction;
+﻿using E_Commerce.Presentation.Attributes;
+using E_Commerce.Services.Abstraction;
 using E_Commerce.Shared;
 using E_Commerce.Shared.DTOS;
 using Microsoft.AspNetCore.Http;
@@ -19,6 +20,9 @@ namespace E_Commerce.Api.Controllers
         }
         #region All Endpiont
         //=========================================================
+        [RedisCash]//After Making Attribute For Cashing 
+        //كدة انا طبقت فكرة الcash => if Data Exsist in Cash git it Without Call Service and Database 
+        //if Data مش موجودة فى ال cash خلاص كمل الFlow بتاعك عادى Send To Service then To Database 
         [HttpGet]
         //Url:{{baseUrl}}/api/nameofController/NameofEndpoint
         #region Before Specification Design Pattern For GetByIdBrandType
