@@ -74,6 +74,10 @@ namespace E_Commerce.Api
             builder.Services.AddScoped<IProductService,ProductService>();
             #endregion
             //============================================
+            #region Inject Object from IBasketService
+            builder.Services.AddScoped<IBasketService, BasketService>();
+            #endregion
+            //============================================
             #region Build Application on server
             var app = builder.Build();
             #endregion
