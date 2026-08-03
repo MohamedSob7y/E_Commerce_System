@@ -12,8 +12,5 @@
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Attributes\Explain All Flow For Cashing\" />
-	</ItemGroup>
 
 </Project>
