@@ -20,7 +20,8 @@ namespace E_Commerce.Api.Controllers
         }
         #region All Endpiont
         //=========================================================
-        [RedisCash]//After Making Attribute For Cashing 
+        [RedisCash(10)]//وانا ببعت للRedis Cash ابعتله الDurationيعنى مدة بقاء الdata innCash 
+        //After Making Attribute For Cashing 
         //كدة انا طبقت فكرة الcash => if Data Exsist in Cash git it Without Call Service and Database 
         //if Data مش موجودة فى ال cash خلاص كمل الFlow بتاعك عادى Send To Service then To Database 
         [HttpGet]
