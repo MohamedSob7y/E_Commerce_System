@@ -66,6 +66,8 @@ namespace E_Commerce.Api.Controllers
         public async Task<ActionResult<ProductDTO>> GetProductById(int id)
         {
             var product=await _productService.GetProductByIdAsync(id);
+            throw new Exception();
+           
             return Ok(product);
         }
         //=========================================================

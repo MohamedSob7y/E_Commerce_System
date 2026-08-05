@@ -1,5 +1,6 @@
 ﻿
 using E_Commerce.Api.Extentions;
+using E_Commerce.Api.Middleware;
 using E_Commerce.Domain.Constracts;
 using E_Commerce.Persistance.Data.DataSeeding;
 using E_Commerce.Persistance.Data.DBContext;
@@ -98,7 +99,29 @@ namespace E_Commerce.Api
             #endregion
             //============================================
             #region Configuration using MiddleWare
+            //this First Middleware يعدى عليها الrequest
             // Configure the HTTP request pipeline.
+            //app.Use(async (context, next) =>
+            //{
+            //    try
+            //    {
+            //        await next(); //دى معناها لو محصلشى اى مشكلة فى تنفيذ الmiddlware ادخل على اللى بعدها ونادى عليها 
+            //    }//طب فى حالة ان فى مشكلة كدة المفروض اعمل logic ومش هكمل باقى الflow
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine(ex.Message);//write Exception in Console
+            //        context.Response.StatusCode=StatusCodes.Status500InternalServerError;
+            //        await context.Response.WriteAsJsonAsync(new
+            //       {
+            //           StatusCode=StatusCodes.Status500InternalServerError,
+            //           Error=$"An Expected Error : {ex.Message}"
+            //       });//write Expcetion in Json
+            //    }
+            //});
+            app.UseMiddleware<ExceptionHandlerMiddleware>();//this Method take Any Class will be represented as middlware 
+            //طب ازاى الclass اللى باعتهوله يتعمل كانه middleware=> must implement interface IMiddlware
+            //حل تانى Make Constructor take RequestDelegate => Call Next Middlware then implement method Invoke take HttpContext عشان اعرف انادى على الMiddlware اللى بعدى وميكنشى فى اى مشاكل 
+            //لان لو بعتله اى class وخلاص هيضرب منى exception in Runtime Not in Compilation Time
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
