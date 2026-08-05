@@ -1,1 +1,2 @@
 https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-10.0&utm_source=chatgpt.com   Docuemtnation Microsoft
+https://chatgpt.com/share/6a739f0f-52f0-83ea-ae0d-dda2c0d6689c
