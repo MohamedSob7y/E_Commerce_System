@@ -66,8 +66,23 @@ namespace E_Commerce.Api.Controllers
         public async Task<ActionResult<ProductDTO>> GetProductById(int id)
         {
             var product=await _productService.GetProductByIdAsync(id);
-            throw new Exception();
-           
+            //================================================
+            #region Solving Problem With if Product is Not Exsist 
+            //if Product is Not Exsist in Database=>  انا هنا مطالب انى اعمل الكلام دا فى كل حتة  لانى لسة هضيف الorder بالتالى هضطر اعمل نفس الكلام دا تانى فى Order Controller عشان كدة لازم اعمله فى مكان مستخدم لكل حاجة هى 
+            //Controller وانا مش عايز اعمل اى لوجيك فى ال
+            //لازم اللى بيعمل الكلام دا الservice مش الcontroller 
+            //if (product is null)
+            //{
+            //    return NotFound(new ProblemDetails()
+            //    {
+            //        Title = "Product Not Found",
+            //        Status = StatusCodes.Status404NotFound,
+            //        Detail = $"Product with Id: {id} is not found",
+            //        Instance = HttpContext.Request.Path
+            //    });
+            //} 
+            #endregion
+            //================================================
             return Ok(product);
         }
         //=========================================================

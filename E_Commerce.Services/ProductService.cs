@@ -2,6 +2,7 @@
 using E_Commerce.Domain.Constracts;
 using E_Commerce.Domain.Entityes;
 using E_Commerce.Services.Abstraction;
+using E_Commerce.Services.Exceptions;
 using E_Commerce.Services.Specifications.ProductSpecification;
 using E_Commerce.Shared;
 using E_Commerce.Shared.DTOS;
@@ -99,7 +100,12 @@ namespace E_Commerce.Services
             #region After Specification Design Pattern
             var spec = new ProductWithTypeandBrandSpecification(id);
             var product = await _uniteofWork.GetRepository<Product, int>().GetByIdAsync(spec);
-            if (product is null) return null;
+            //=========================================
+            #region Throw Exception
+            if (product is null)
+                throw new ProductNotFoundException(id);
+            #endregion
+            //=========================================
             return _Mapper.Map<Product, ProductDTO>(product);
             #endregion
         }
