@@ -26,6 +26,19 @@ namespace E_Commerce.Api.Middleware
             {
                 await _next.Invoke(context);//Call Next Middlware by using Context دا فى حالة ان محصلشى اى مشكلة فى تنفيذ الmiddlware
                 //Context دا معناها انا بتحكم فى الrequest والFlow بتاعه كامل 
+                
+                //دى حل لمشكلة الURL Not Found 
+                if(context.Response.StatusCode==StatusCodes.Status404NotFound)
+                {
+                    var problem = new ProblemDetails()
+                    {
+                        Title ="URL Not Found",
+                        Status=StatusCodes.Status404NotFound,
+                        Detail=$"Endpiont: {context.Request.Path} is not found",
+                        Instance=context.Request.Path,//this REquest اللى سبب المشكلة اصلا 
+                    };
+                    await context.Response.WriteAsJsonAsync(problem);
+                }
             }
             catch (Exception ex)
             {
