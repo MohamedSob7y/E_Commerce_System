@@ -1,5 +1,6 @@
 ﻿
 using E_Commerce.Api.Extentions;
+using E_Commerce.Api.Factories;
 using E_Commerce.Api.Middleware;
 using E_Commerce.Domain.Constracts;
 using E_Commerce.Persistance.Data.DataSeeding;
@@ -8,6 +9,7 @@ using E_Commerce.Persistance.Repositories;
 using E_Commerce.Services;
 using E_Commerce.Services.Abstraction;
 using E_Commerce.Services.Mapping_Profiles;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Writers;
 using StackExchange.Redis;
@@ -47,14 +49,14 @@ namespace E_Commerce.Api
             //============================================
             #region Inject Object From IConnectionMultiplexer using Redis For Basket Module
 
-            builder.Services.AddSingleton<IConnectionMultiplexer>(P=>
+            builder.Services.AddSingleton<IConnectionMultiplexer>(P =>
             {
                 return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!);
             });//لانى عايز الObject All Life Cycle of Application 
             #endregion
             //============================================
             #region Inject Object From IBasketRepo in BasketService
-            builder.Services.AddScoped<IBasketRepository,BasketRepository>();
+            builder.Services.AddScoped<IBasketRepository, BasketRepository>();
             #endregion
             //============================================
             #region Inject Object From Mapping Profile
@@ -72,7 +74,7 @@ namespace E_Commerce.Api
             #endregion
             //============================================
             #region Inject Object From IProductService
-            builder.Services.AddScoped<IProductService,ProductService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
             #endregion
             //============================================
             #region Inject Object from IBasketService
@@ -85,6 +87,15 @@ namespace E_Commerce.Api
             //============================================
             #region Inject Object From ICashService
             builder.Services.AddScoped<ICashService, CashSerivce>();
+            #endregion
+            //============================================
+            #region Set Setting Of Message Validation Error اللى راجعة 
+            builder.Services.Configure<ApiBehaviorOptions>
+                   (options =>
+                   {
+                       options.InvalidModelStateResponseFactory =
+                       ApiResponseFactory.GenerateApiValidationResponse;
+                   });
             #endregion
             //============================================
             #region Build Application on server
@@ -137,7 +148,7 @@ namespace E_Commerce.Api
             #endregion
             //============================================
             #region Run Application
-            app.Run(); 
+            app.Run();
             #endregion
         }
     }
