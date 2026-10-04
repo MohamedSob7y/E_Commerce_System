@@ -70,8 +70,17 @@ namespace E_Commerce.Shared.Common_Responses
         }
 
         //هوصل للConstructors دول ازاى عن طريق الStatic Factory Method
-        public static Result<TValue> Ok(TValue value) => new (value);
-        public new static Result<TValue> Fail(Error error) => new (error);
+        public static Result<TValue> Ok(TValue value) => new(value);
+        public new static Result<TValue> Fail(Error error) => new(error);
         public new static Result<TValue> Fail(List<Error> errors) => new(errors);
+        //============================================================================
+        #region Operator Overloading
+        //this Operator Overloading using this => لما ابعت  return Data Direct => كدة معناها ان بعمل Object fRom Result<ProductDTO> by using Ok Methid That Take Value
+        //لما اعمل return Error=> كدة انا عملت Object from Result<ProductDTO> by using Fail Method That Take Error
+        //لما اعمل return List<Error> => كدة انا عملت Object from Result<ProductDTO> by using Fail Method That Take List<Error>
+        public static implicit operator Result<TValue>(TValue value) => Ok(value);//دى بعملها عشان اقدر اعمل Implicit Conversion from TValue to Result<TValue> يعنى لو انا عندى object من النوع TValue اقدر اعمله Assign to Object from Result<TValue> مباشرة بدون اى مشاكل
+        public static implicit operator Result<TValue>(Error error) => Fail(error);//دى بعملها عشان اقدر اعمل Implicit Conversion from Error to Result<TValue> يعنى لو انا عندى object من النوع Error اقدر اعمله Assign to Object from Result<TValue> مباشرة بدون اى مشاكل
+        public static implicit operator Result<TValue>(List<Error> errors) => Fail(errors);//دى بعملها عشان اقدر اعمل Implicit Conversion from List<Error> to Result<TValue> يعنى لو انا عندى object من النوع List<Error> اقدر اعمله Assign to Object from Result<TValue> مباشرة بدون اى مشاكل
+        #endregion
     }
 }

@@ -1,4 +1,5 @@
 ﻿using E_Commerce.Presentation.Attributes;
+using E_Commerce.Presentation.Controllers;
 using E_Commerce.Services.Abstraction;
 using E_Commerce.Shared;
 using E_Commerce.Shared.DTOS;
@@ -8,9 +9,8 @@ using System.Threading.Tasks;
 
 namespace E_Commerce.Api.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ProductController : ControllerBase
+    
+    public class ProductController : ApiBaseController
     {
         private readonly IProductService _productService;
 
@@ -65,8 +65,8 @@ namespace E_Commerce.Api.Controllers
         //طريقة الquery Paramer {{baseUrl}}/api/Product/GetProductById?id=2
         public async Task<ActionResult<ProductDTO>> GetProductById(int id)
         {
-            var product=await _productService.GetProductByIdAsync(id);
-            //================================================
+            var Result=await _productService.GetProductByIdAsync(id);//this return Result<ProductDTO>
+                                                                     //================================================
             #region Solving Problem With if Product is Not Exsist 
             //if Product is Not Exsist in Database=>  انا هنا مطالب انى اعمل الكلام دا فى كل حتة  لانى لسة هضيف الorder بالتالى هضطر اعمل نفس الكلام دا تانى فى Order Controller عشان كدة لازم اعمله فى مكان مستخدم لكل حاجة هى 
             //Controller وانا مش عايز اعمل اى لوجيك فى ال
@@ -83,7 +83,15 @@ namespace E_Commerce.Api.Controllers
             //} 
             #endregion
             //================================================
-            return Ok(product);
+            #region After Making Result Pattern
+            return Ok(Result);//if Success
+
+
+            return new ProblemDetails//if Fail
+
+            #endregion
+
+
         }
         //=========================================================
         [HttpGet("brands")]

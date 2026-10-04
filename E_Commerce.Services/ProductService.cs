@@ -5,6 +5,7 @@ using E_Commerce.Services.Abstraction;
 using E_Commerce.Services.Exceptions;
 using E_Commerce.Services.Specifications.ProductSpecification;
 using E_Commerce.Shared;
+using E_Commerce.Shared.Common_Responses;
 using E_Commerce.Shared.DTOS;
 using System;
 using System.Collections.Generic;
@@ -71,15 +72,15 @@ namespace E_Commerce.Services
         #region GetAll Product After Applying Pagination
         public async Task<PaginatedResult<ProductDTO>> GetAllProductsAsync(ProductQueryParam productQueryParam)//For Filteration For Brand+Type
         {
-            var Repo =  _uniteofWork.GetRepository<Product, int>();
+            var Repo = _uniteofWork.GetRepository<Product, int>();
             //دى عملتها كدة عشان عايز اعمل Navigation Property تكون Loaded عندى وانا بعمل GetAll Product=> تظهر معايا ال ProductBrand + ProductTypes 
             //عايز اكون specification object For include Navigation Property => ProductBrand + ProductTypes
             //=================================================================================================================================
             var Spec = new ProductWithTypeandBrandSpecification(productQueryParam);
-            var products =await Repo.GetAllAsync(Spec);
+            var products = await Repo.GetAllAsync(Spec);
             //=================================================================================================================================
-            var newSpec =new ProductWithCountSpecification(productQueryParam);
-            var totalCount=await Repo.CountAsync(newSpec);//this For Count Before Pagination عشان كدة عملت New specification جديدة لان لو بعتلها القديمة اللى هى ProductWithTypeAndBrandSpecification كدة هو هيعمل الCount After Pagination وانا مش عايز كدة عشان كدة عملت واحدة جديدة للحتة دى  
+            var newSpec = new ProductWithCountSpecification(productQueryParam);
+            var totalCount = await Repo.CountAsync(newSpec);//this For Count Before Pagination عشان كدة عملت New specification جديدة لان لو بعتلها القديمة اللى هى ProductWithTypeAndBrandSpecification كدة هو هيعمل الCount After Pagination وانا مش عايز كدة عشان كدة عملت واحدة جديدة للحتة دى  
             //=================================================================================================================================
             var DataToReturn = _Mapper.Map<IEnumerable<Product>, IEnumerable<ProductDTO>>(products);
             var CountofReturnedData = DataToReturn.Count();
@@ -89,7 +90,31 @@ namespace E_Commerce.Services
         }
         #endregion
         //=============================================================
-        public async Task<ProductDTO> GetProductByIdAsync(int id)
+        #region Before Result Pattern
+        //public async Task<ProductDTO> GetProductByIdAsync(int id)
+        //{
+        //    #region Before Specification Design Pattern
+        //    //var product = await _uniteofWork.GetRepository<Product, int>().GetByIdAsync(id);
+        //    //if (product is null) return null;
+        //    //return _Mapper.Map<Product, ProductDTO>(product);
+        //    #endregion
+        //    //=============================================================
+        //    #region After Specification Design Pattern
+        //    var spec = new ProductWithTypeandBrandSpecification(id);
+        //    var product = await _uniteofWork.GetRepository<Product, int>().GetByIdAsync(spec);
+        //    //=========================================
+        //    #region Throw Exception
+        //    if (product is null)
+        //        throw new ProductNotFoundException(id);
+        //    #endregion
+        //    //=========================================
+        //    return _Mapper.Map<Product, ProductDTO>(product);
+        //    #endregion
+        //} 
+        #endregion
+        //=============================================================
+        #region After Result Pattern
+        public async Task<Result<ProductDTO>> GetProductByIdAsync(int id)
         {
             #region Before Specification Design Pattern
             //var product = await _uniteofWork.GetRepository<Product, int>().GetByIdAsync(id);
@@ -101,14 +126,30 @@ namespace E_Commerce.Services
             var spec = new ProductWithTypeandBrandSpecification(id);
             var product = await _uniteofWork.GetRepository<Product, int>().GetByIdAsync(spec);
             //=========================================
-            #region Throw Exception
-            if (product is null)
-                throw new ProductNotFoundException(id);
+            #region Throw Exception Before Result Pattern
+            //if (product is null)
+            //    throw new ProductNotFoundException(id);
             #endregion
             //=========================================
-            return _Mapper.Map<Product, ProductDTO>(product);
+            #region After Result Pattern After Operator Overloading
+            if (product is null) 
+                return Error.NotFound("Product Not Found", $"Product with this id : {id} is Not Found");//this Single Error
+            //this Genrate object From Result<ProductDTO> using Method Fail وباعتلها error نوعه NoFound بدل ماكل شوية انادى عليها بالطريقة كاملة 
+            #endregion
+            //=========================================
+            //using Static Factory Method After Makeing Operator Overloading in Result Class
+            return _Mapper.Map<Product, ProductDTO>(product);//this create Object from REsult<ProductDTO> using Method Ok That Take Value
+
+            //عشان كدة بدل ماعمل الobject وانادي على Function اللى بياخدها لاء انا عامل Operator Overloading تبعت الData على طول فى حالة الSuccess using Ok يعنى return Data فقط ودى معناها انك عملت object fRom Result<ProductDTO> using Ok That Take Data
+            //بدل ماعمل object وانادى على Method Fail واابعتلها الErrr => لاء انا هبعت الerror على طول يعنى هعمل return For Error Direct that means that You Create object from Result<ProductDto>  using Method Fail That Take Error يعنى انا بعمل return على طول للحاجة اللى بتاخدها الStatic Factory Method like Data or Error or List Of Error => using Operator Overloading 
+           
+            //Before Operator Overloading
+            //return Result<ProductDTO>.Ok(_Mapper.Map<Product, ProductDTO>(product));
+
+
             #endregion
         }
+        #endregion
         //=============================================================
         public async Task<IEnumerable<TypeDTO>> GetAllTypeAsync()
         {
