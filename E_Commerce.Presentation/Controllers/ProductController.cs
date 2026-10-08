@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace E_Commerce.Api.Controllers
 {
-    
+
     public class ProductController : ApiBaseController
     {
         private readonly IProductService _productService;
 
         public ProductController(IProductService productService)
         {
-           _productService = productService;
+            _productService = productService;
         }
         #region All Endpiont
         //=========================================================
@@ -65,8 +65,8 @@ namespace E_Commerce.Api.Controllers
         //طريقة الquery Paramer {{baseUrl}}/api/Product/GetProductById?id=2
         public async Task<ActionResult<ProductDTO>> GetProductById(int id)
         {
-            var Result=await _productService.GetProductByIdAsync(id);//this return Result<ProductDTO>
-                                                                     //================================================
+            var Result = await _productService.GetProductByIdAsync(id);//this return Result<ProductDTO>
+                                                                       //================================================
             #region Solving Problem With if Product is Not Exsist 
             //if Product is Not Exsist in Database=>  انا هنا مطالب انى اعمل الكلام دا فى كل حتة  لانى لسة هضيف الorder بالتالى هضطر اعمل نفس الكلام دا تانى فى Order Controller عشان كدة لازم اعمله فى مكان مستخدم لكل حاجة هى 
             //Controller وانا مش عايز اعمل اى لوجيك فى ال
@@ -83,11 +83,8 @@ namespace E_Commerce.Api.Controllers
             //} 
             #endregion
             //================================================
-            #region After Making Result Pattern
-            return Ok(Result);//if Success
-
-
-            return new ProblemDetails//if Fail
+            #region After Making Result Pattern + ApiBaseController
+            return HandleResult<ProductDTO>(Result);//دى موجودة جوه الApiBaseController
 
             #endregion
 
@@ -98,7 +95,7 @@ namespace E_Commerce.Api.Controllers
         //{{baseUrl}}/api/Product/brands
         public async Task<ActionResult<IEnumerable<BrandDTO>>> GetAllBrand()
         {
-            var Brands=await _productService.GetAllBrandAsync();
+            var Brands = await _productService.GetAllBrandAsync();
             return Ok(Brands);
         }
         //=========================================================
