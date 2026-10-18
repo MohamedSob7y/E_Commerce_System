@@ -5,6 +5,7 @@ using E_Commerce.Api.Middleware;
 using E_Commerce.Domain.Constracts;
 using E_Commerce.Persistance.Data.DataSeeding;
 using E_Commerce.Persistance.Data.DBContext;
+using E_Commerce.Persistance.Identity_Data.DbContext;
 using E_Commerce.Persistance.Repositories;
 using E_Commerce.Services;
 using E_Commerce.Services.Abstraction;
@@ -39,6 +40,14 @@ namespace E_Commerce.Api
             builder.Services.AddDbContext<StoreDBContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
+            });
+
+            #endregion
+            //============================================
+            #region Inject object From DbContext For Security
+            builder.Services.AddDbContext<StoreIdentityDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
             });
 
             #endregion
@@ -106,6 +115,7 @@ namespace E_Commerce.Api
             //عشان اعرف انادى الMethod اللى جوه الSeedingData هى محتاجه DbContext object وهنا مش هعرف ask CLR To Inject this Object By implicitlyعن طريق Constructor لان مشهينفع اعمله هنا فى Main بالتالى هطلبه بطريقة غير مباشرة Explcitily From Clr
             //Explcicit Injection Fom DbContext
             await app.MigrateDatabaseAsync();//Call Extention Method
+            await app.MigrateIdentityDatabaseAsync();//this Method For Applying Pending Migration For Security IdentitytDb
             await app.SeedDataAsync();//Call ExtentionMethods
             #endregion
             //============================================
