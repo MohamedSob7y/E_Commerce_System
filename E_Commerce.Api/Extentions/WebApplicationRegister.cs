@@ -1,6 +1,7 @@
 ﻿using E_Commerce.Domain.Constracts;
 using E_Commerce.Persistance.Data.DBContext;
 using E_Commerce.Persistance.Identity_Data.DbContext;
+using E_Commerce.Persistance.IdentityData.Data_Seed;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
@@ -37,8 +38,15 @@ namespace E_Commerce.Api.Extentions
         public static async Task<WebApplication> SeedDataAsync(this WebApplication app)
         {
             using var Scope = app.Services.CreateScope();
-            var DataIntializer = Scope.ServiceProvider.GetRequiredService<IDataSeeding>();
+            var DataIntializer = Scope.ServiceProvider.GetRequiredKeyedService<IDataSeeding>("Default");//كدة انا بعتله الKey اسمه default بكدة هيدينى object From DataSeed
            await DataIntializer.IntializeAsync();
+            return app;
+        }
+        public static async Task<WebApplication> SeedIdentityDataAsync(this WebApplication app)
+        {
+            using var Scope = app.Services.CreateScope();
+            var DataIntializer = Scope.ServiceProvider.GetRequiredKeyedService<IDataSeeding>("Identity");//كدة انا بعتله الKey اسمه default بكدة هيدينى object From IDentityDataSeed
+            await DataIntializer.IntializeAsync();
             return app;
         }
     }

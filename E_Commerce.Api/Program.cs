@@ -3,13 +3,16 @@ using E_Commerce.Api.Extentions;
 using E_Commerce.Api.Factories;
 using E_Commerce.Api.Middleware;
 using E_Commerce.Domain.Constracts;
+using E_Commerce.Domain.Entityes.Identity_Module;
 using E_Commerce.Persistance.Data.DataSeeding;
 using E_Commerce.Persistance.Data.DBContext;
 using E_Commerce.Persistance.Identity_Data.DbContext;
+using E_Commerce.Persistance.IdentityData.Data_Seed;
 using E_Commerce.Persistance.Repositories;
 using E_Commerce.Services;
 using E_Commerce.Services.Abstraction;
 using E_Commerce.Services.Mapping_Profiles;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Writers;
@@ -79,7 +82,14 @@ namespace E_Commerce.Api
             #endregion
             //============================================
             #region Inject Object From ISedding Data
-            builder.Services.AddScoped<IDataSeeding, DataSeeding>();//Inject Object From ISeeding Data
+            //builder.Services.AddScoped<IDataSeeding, DataSeeding>();//Inject Object From ISeeding Data
+            //هنا المفروض كمان اسجل انه لما يطلب object From IDataSeeding اديه Object From IdentityDataInitializer
+            //builder.Services.AddScoped<IDataSeeding, IdentityDataInitializer>();//بس لما انا بعمل الطريقة دى كدة انا بعمل override على الطريقة الاولى والمفروض انا عايز اعمل الTwo Implementation 
+            //يبقى الحل انى استخدم الaddKeys عشان لما يطلب object from IDataSeeding  هشوف الimplementation بتاعه على حسب الImplmentation بتاعه هديله الobject المعين اللى هو طالبه 
+
+            builder.Services.AddKeyedScoped<IDataSeeding, IdentityDataInitializer>("Identity");
+            builder.Services.AddKeyedScoped<IDataSeeding, DataSeeding>("Default");
+            //يبقى اديك الobject على حسب انت بتعتلى ال  Key اية هو على حسب الimplementation
             #endregion
             //============================================
             #region Inject Object From IProductService
@@ -88,6 +98,10 @@ namespace E_Commerce.Api
             //============================================
             #region Inject Object from IBasketService
             builder.Services.AddScoped<IBasketService, BasketService>();
+            #endregion
+            //============================================
+            #region Inject Object From IAuthenticationService
+            builder.Services.AddScoped<IAuthenticationService, AuthenticationService>(); 
             #endregion
             //============================================
             #region Inject Object From ICashRepository
@@ -107,6 +121,25 @@ namespace E_Commerce.Api
                    });
             #endregion
             //============================================
+            #region Ask CLr to inject Object From 2 Service RoleManger+ UserManger لازم اعمله 
+            builder.Services.AddIdentityCore<ApplicationUser>().AddRoles<IdentityRole>().AddEntityFrameworkStores<StoreIdentityDbContext>();//دى الطريقة الاحسن  
+
+
+            //builder.Services.AddIdentityCore<ApplicationUser>(options =>
+            //{
+            //    options.User.RequireUniqueEmail = true;
+            //   // options.User.AllowedUserNameCharacters = new[]//حط الحروف اللى متاحة 
+            //   //من غير ماتحط اى حاجة بيتعمل Default    
+            //}).AddRoles<IdentityRole>().AddEntityFrameworkStores<StoreIdentityDbContext>();//دى الطريقة الاحسن  
+            //الطريقة دى بقا بتنزلى الحجات اللى انا محتاجها فقط من Service Identity يعنى انا دلؤقتى استخدمت الIdentityCode فبتنزل الUserManger اللى انا محتاجه +  زودت ان انزل عليهم IdentityRole بزود اللى انا عايزه براحتى عشان مينزلشى اى حاجة انا مش محتاجها عشان دا يبقى مش احسن حاجة فى الPerformance
+            //ولو انا محتاج اعمل Conatrin when Createing UserManger اعمل Options
+
+            //builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<StoreIdentityDbContext>();//دى الطريقة الاولى 
+            //الطريقة دى لما بستخدمها بتنزل الservice Of Identity Automatic like UserManger داانا محتاجه + IdentityRole ودا محتاجه + SignInManger وانا مش محتاجه بس بينزل تلقائى لما بستخدم الطريقة دى عشان كدة الطريقة دى مش احسن حاجة لانها بتنزلى جات او service From Identity انا مش محتاجها 
+            //اخر جزئية اللى هى AddEntity انا بقؤل ان الComponent اللى بتنزل هيكون ليها access for Tables اللى نزلت مع الPackage Identity
+            //So انا بقؤله الManger اللى نزلتها هيبقى ليها access on IdentityDbContextStore عشان الtables اللى نزلت مع الPackage Identity 
+            #endregion
+            //============================================
             #region Build Application on server
             var app = builder.Build();
             #endregion
@@ -117,6 +150,7 @@ namespace E_Commerce.Api
             await app.MigrateDatabaseAsync();//Call Extention Method
             await app.MigrateIdentityDatabaseAsync();//this Method For Applying Pending Migration For Security IdentitytDb
             await app.SeedDataAsync();//Call ExtentionMethods
+            await app.SeedIdentityDataAsync();
             #endregion
             //============================================
             #region Configuration using MiddleWare
