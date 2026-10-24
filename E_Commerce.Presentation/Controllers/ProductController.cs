@@ -3,6 +3,7 @@ using E_Commerce.Presentation.Controllers;
 using E_Commerce.Services.Abstraction;
 using E_Commerce.Shared;
 using E_Commerce.Shared.DTOS;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace E_Commerce.Api.Controllers
         //كدة انا طبقت فكرة الcash => if Data Exsist in Cash git it Without Call Service and Database 
         //if Data مش موجودة فى ال cash خلاص كمل الFlow بتاعك عادى Send To Service then To Database 
         [HttpGet]
+        [Authorize]
         //Url:{{baseUrl}}/api/nameofController/NameofEndpoint
         #region Before Specification Design Pattern For GetByIdBrandType
         //public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts()
