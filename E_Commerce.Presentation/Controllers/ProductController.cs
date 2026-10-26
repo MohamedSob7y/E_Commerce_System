@@ -26,7 +26,7 @@ namespace E_Commerce.Api.Controllers
         //كدة انا طبقت فكرة الcash => if Data Exsist in Cash git it Without Call Service and Database 
         //if Data مش موجودة فى ال cash خلاص كمل الFlow بتاعك عادى Send To Service then To Database 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles ="SuperAdmin")]
         //Url:{{baseUrl}}/api/nameofController/NameofEndpoint
         #region Before Specification Design Pattern For GetByIdBrandType
         //public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts()

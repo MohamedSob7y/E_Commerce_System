@@ -12,12 +12,15 @@ using E_Commerce.Persistance.Repositories;
 using E_Commerce.Services;
 using E_Commerce.Services.Abstraction;
 using E_Commerce.Services.Mapping_Profiles;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Writers;
 using StackExchange.Redis;
 using System.Reflection.Metadata.Ecma335;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace E_Commerce.Api
@@ -101,7 +104,7 @@ namespace E_Commerce.Api
             #endregion
             //============================================
             #region Inject Object From IAuthenticationService
-            builder.Services.AddScoped<IAuthenticationService, AuthenticationService>(); 
+            builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             #endregion
             //============================================
             #region Inject Object From ICashRepository
@@ -139,6 +142,30 @@ namespace E_Commerce.Api
             //اخر جزئية اللى هى AddEntity انا بقؤل ان الComponent اللى بتنزل هيكون ليها access for Tables اللى نزلت مع الPackage Identity
             //So انا بقؤله الManger اللى نزلتها هيبقى ليها access on IdentityDbContextStore عشان الtables اللى نزلت مع الPackage Identity 
             #endregion
+
+            //بتحدد  Default Authentication Schema + 
+            builder.Services.AddAuthentication(options =>
+            {
+                //default AuthenitcationSchema == the Same Schema اللى عملت بيها الToken بتاعى => JWT Beare
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;//دى فى حالة ان Token invalida Call Use Authorization Middleware 
+            }).AddJwtBearer(options =>//عشان اعلمه ازاى يعمل Validate For Token
+            {
+                options.SaveToken = true;//Save Token in httpcontext ولو احتاجته بجيبه عن طريق Method GetToken لو تمم اخزنه ولو مش تمم مش هخزنه
+                //بقؤله يبص على اية عشان يعرف هو صح ولا غلط 
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    //هنا بقؤله مكان الValid Value يقراها من appsetting عشان يقارن بين اللى موجودين عنده واللى User باعتها فى الToken
+                    ValidIssuer = builder.Configuration["JwtOptions:Issuer"],
+                    ValidAudience = builder.Configuration["JwtOptions:Audience"],
+                    IssuerSigningKey=new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtOptions:SecretKey"]!))//Check For Secret Key
+                    //كل دى حجات بيبص عليها عشان يعمل Validate for Token 
+                };
+            });
+
             //============================================
             #region Build Application on server
             var app = builder.Build();
@@ -185,7 +212,11 @@ namespace E_Commerce.Api
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            app.UseAuthentication();
+            app.UseAuthorization();//دول عشان الserver فى كل request بيبعته الClient يتاكدة من الJWT اللى باعته + Validate عليه 
+            //دى المرحلة بعد ما الserverعمل الtoken For User ورجعوله 
+            //فالuser send Request Using this Token and Server Validat For this Reuqest by Pipline Use Authentication + Use Authorization
+
             app.UseStaticFiles();
 
             app.MapControllers();

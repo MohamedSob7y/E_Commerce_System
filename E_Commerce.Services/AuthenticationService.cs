@@ -63,6 +63,7 @@ namespace E_Commerce.Services
         }
 
         //https://chatgpt.com/share/6add143a-409c-83ea-85cd-8e0ef5923359  Explain JWT 
+        //https://www.jwt.io/  بيعمل decoding For Token
         public async Task<string> CreateTokenAsync(ApplicationUser user)
         {
 
