@@ -57,7 +57,7 @@ namespace E_Commerce.Services
                 var token = await CreateTokenAsync(User);
                 return new UserDTO(User.Email, User.DisplayName, token);
             }
-                
+
             //If Error
             return IdentityResult.Errors.Select(E => Error.Validation(E.Code, E.Description)).ToList();
         }
@@ -113,7 +113,19 @@ namespace E_Commerce.Services
 
         }
 
+        public async Task<bool> CheckEmailAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            return user != null;
+        }
 
+        public async Task<Result<UserDTO>> GetUserByEmailAsync(string Email)
+        {
+            var user = await _userManager.FindByEmailAsync(Email);
+            if (user is null)
 
+                return Error.NotFound("User.NotFound", $"User With This Email {Email} is Not Found");
+            return new UserDTO(user.Email!, user.DisplayName, await CreateTokenAsync(user));
+        }
     }
 }
