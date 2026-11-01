@@ -9,7 +9,7 @@ namespace E_Commerce.Shared.Common_Responses
     public class Result
     {
         //this Class Has Status[IsSuccess => return Value +IsFaluire => return error and Excplain this Error] + List Of Errors
-        //Result Pattern internally use Compoite Design Pattern => because this Class has List of Errors + Status
+        //Result Pattern internally use Composite Design Pattern => because this Class has List of Errors + Status
         //as Result Pattern retrun List Of Error and each  Error has anthor Complex Object
         private readonly List<Error> _errors = [];
         public bool IsSuccess => _errors.Count == 0;//دى ترجع true if Countof Errors=0 يعنى مفيش اى errors

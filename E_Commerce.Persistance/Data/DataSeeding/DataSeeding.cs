@@ -1,5 +1,6 @@
 ﻿using E_Commerce.Domain.Constracts;
 using E_Commerce.Domain.Entityes;
+using E_Commerce.Domain.Entityes.OrderModule;
 using E_Commerce.Persistance.Data.DBContext;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -30,7 +31,8 @@ namespace E_Commerce.Persistance.Data.DataSeeding
                 //All Linq Method has method With Async  
                 var hasBrand = await _storeDBContext.productBrands.AnyAsync();
                 var HasTypes = await _storeDBContext.productTypes.AnyAsync();
-                if (hasProduct && hasBrand && HasTypes)
+                var hasdelivery = await _storeDBContext.Set<DeliveryMethod>().AnyAsync();
+                if (hasProduct && hasBrand && HasTypes && hasdelivery)
                 {
                     return;//كدة معناناها فى Data in Tables كدة مش هينفع اعمل Seeding For Data 
                 }//طب لو مفيش عايز بقا ادخل الداتا دى جوه الTables
@@ -53,8 +55,13 @@ namespace E_Commerce.Persistance.Data.DataSeeding
                 if (!hasProduct)
                 {
                     await SeedDataFromJson<Product, int>("products.json", _storeDBContext.Products);
-                    await _storeDBContext.SaveChangesAsync();
                 }
+
+                if (!hasdelivery)
+                {
+                    await SeedDataFromJson<DeliveryMethod, int>("delivery.json", _storeDBContext.Set<DeliveryMethod>());
+                }
+                await _storeDBContext.SaveChangesAsync();
 
             }
             catch (Exception ex)
