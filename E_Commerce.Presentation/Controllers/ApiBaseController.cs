@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -93,7 +94,7 @@ namespace E_Commerce.Presentation.Controllers
 
         }
 
-
+        //===============================================================
         #region Private Method Helper For Single Error مبعوتلها
         //this Method Handle Response على حسب نوع الerror اللى جايلها 
         private ActionResult HandleSingleProblem(Error error)
@@ -117,6 +118,15 @@ namespace E_Commerce.Presentation.Controllers
            _ => StatusCodes.Status500InternalServerError,
        };
         #endregion
+        //===============================================================
+        #region Method Get Email From Token After login
+        protected string GetEmailFromToken()=> User.FindFirstValue(ClaimTypes.Email)!;
+        
+
+
+
+        #endregion
+
 
     }
 }

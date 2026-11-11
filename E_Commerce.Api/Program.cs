@@ -115,6 +115,10 @@ namespace E_Commerce.Api
             builder.Services.AddScoped<ICashService, CashSerivce>();
             #endregion
             //============================================
+            #region Inject object From IOrderService
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            #endregion
+            //============================================
             #region Set Setting Of Message Validation Error اللى راجعة 
             builder.Services.Configure<ApiBehaviorOptions>
                    (options =>

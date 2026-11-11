@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace E_Commerce.Shared.DTOS.OrderDTOs
 {
-    public class OrderItemDto
+    public record OrderItemDto
     {
-        public string ProductName { get; set; } = default!;
-        public decimal Price { get; set; }
-        public string PictureUrl { get; set; }= default!;
-        public int Quantity { get; set; }
+        public string ProductName { get; init; } = default!;
+        public decimal Price { get; init; }
+        public string PictureUrl { get; init; }= default!;
+        public int Quantity { get; init; }
 
     }
 }
